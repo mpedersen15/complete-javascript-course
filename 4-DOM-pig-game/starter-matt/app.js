@@ -10,10 +10,19 @@ GAME RULES:
 */
 
 // DOM elements
-var rollDiceBtn, diceImg;
+var rollDiceBtn, diceImg, roundScoreElements, playerPanelElements;
 
 rollDiceBtn = document.querySelector(".btn-roll");
 diceImg = document.querySelector("img.dice");
+roundScoreElements = [
+  document.getElementById("current-0"),
+  document.getElementById("current-1")
+];
+
+playerPanelElements = [
+  document.querySelector(".player-0-panel"),
+  document.querySelector(".player-1-panel")
+];
 
 // App State
 var appState = {
@@ -30,6 +39,28 @@ function rollDice() {
     diceImg.src = "dice-" + roll + ".png";
     diceImg.style.display = "block";
   }, 100);
+
+  if (roll === 1) {
+    appState.roundScore = 0;
+    updateRoundScoreElement();
+    appState.currentPlayer = appState.currentPlayer ? 0 : 1;
+    updateCurrentPlayerStyling();
+  } else {
+    appState.roundScore += roll;
+    updateRoundScoreElement();
+  }
+}
+
+function updateRoundScoreElement() {
+  roundScoreElements[appState.currentPlayer].textContent = appState.roundScore;
+}
+
+function updateCurrentPlayerStyling() {
+  var inactivePlayer = appState.currentPlayer ? 0 : 1;
+  playerPanelElements[inactivePlayer].className = playerPanelElements[
+    inactivePlayer
+  ].className.replace(" active", "");
+  playerPanelElements[appState.currentPlayer].className += " active";
 }
 
 // Attach Event Listeners
