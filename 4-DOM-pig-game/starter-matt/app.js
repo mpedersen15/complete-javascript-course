@@ -10,7 +10,13 @@ GAME RULES:
 */
 
 // DOM elements
-var rollDiceBtn, diceImg, roundScoreElements, playerPanelElements;
+var rollDiceBtn,
+  diceImg,
+  roundScoreElements,
+  playerPanelElements,
+  holdBtn,
+  scoreElements,
+  newGameBtn;
 
 rollDiceBtn = document.querySelector(".btn-roll");
 diceImg = document.querySelector("img.dice");
@@ -24,11 +30,25 @@ playerPanelElements = [
   document.querySelector(".player-1-panel")
 ];
 
+holdBtn = document.querySelector(".btn-hold");
+
+scoreElements = [
+  document.getElementById("score-0"),
+  document.getElementById("score-1")
+];
+
+newGameBtn = document.querySelector(".btn-new");
+
 // App State
 var appState = {
   scores: [0, 0], // Player 1 and Player 2 scores, respectively
   currentPlayer: 0,
-  roundScore: 0
+  roundScore: 0,
+  reset: function() {
+    this.scores = [0, 0];
+    this.currentPlayer = 0;
+    this.roundScore = 0;
+  }
 };
 
 // Callback functions
@@ -63,5 +83,40 @@ function updateCurrentPlayerStyling() {
   playerPanelElements[appState.currentPlayer].className += " active";
 }
 
+function hold() {
+  appState.scores[appState.currentPlayer] += appState.roundScore;
+  scoreElements[appState.currentPlayer].textContent =
+    appState.scores[appState.currentPlayer];
+
+  if (appState.scores[appState.currentPlayer] >= 100) {
+    setTimeout(function() {
+      alert(
+        "Player " +
+          (appState.currentPlayer + 1) +
+          " wins! Click NEW GAME to play again"
+      );
+    }, 100);
+  } else {
+    appState.roundScore = 0;
+    updateRoundScoreElement();
+    appState.currentPlayer = appState.currentPlayer ? 0 : 1;
+    updateCurrentPlayerStyling();
+  }
+}
+
+function startNewGame() {
+  appState.reset();
+  scoreElements[0].textContent = 0;
+  scoreElements[1].textContent = 0;
+  roundScoreElements[0].textContent = 0;
+  roundScoreElements[1].textContent = 0;
+  diceImg.style.display = "none";
+}
+
 // Attach Event Listeners
 rollDiceBtn.addEventListener("click", rollDice);
+holdBtn.addEventListener("click", hold);
+newGameBtn.addEventListener("click", startNewGame);
+
+// Start initial game
+startNewGame();
