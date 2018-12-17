@@ -16,7 +16,8 @@ var rollDiceBtn,
   playerPanelElements,
   holdBtn,
   scoreElements,
-  newGameBtn;
+  newGameBtn,
+  playerNameElements;
 
 rollDiceBtn = document.querySelector(".btn-roll");
 diceImg = document.querySelector("img.dice");
@@ -38,6 +39,11 @@ scoreElements = [
 ];
 
 newGameBtn = document.querySelector(".btn-new");
+
+playerNameElements = [
+  document.getElementById("name-0"),
+  document.getElementById("name-1")
+];
 
 // App State
 var appState = {
@@ -61,10 +67,7 @@ function rollDice() {
   }, 100);
 
   if (roll === 1) {
-    appState.roundScore = 0;
-    updateRoundScoreElement();
-    appState.currentPlayer = appState.currentPlayer ? 0 : 1;
-    updateCurrentPlayerStyling();
+    changeActivePlayer();
   } else {
     appState.roundScore += roll;
     updateRoundScoreElement();
@@ -76,11 +79,8 @@ function updateRoundScoreElement() {
 }
 
 function updateCurrentPlayerStyling() {
-  var inactivePlayer = appState.currentPlayer ? 0 : 1;
-  playerPanelElements[inactivePlayer].className = playerPanelElements[
-    inactivePlayer
-  ].className.replace(" active", "");
-  playerPanelElements[appState.currentPlayer].className += " active";
+  playerPanelElements[0].classList.toggle("active");
+  playerPanelElements[1].classList.toggle("active");
 }
 
 function hold() {
@@ -88,20 +88,26 @@ function hold() {
   scoreElements[appState.currentPlayer].textContent =
     appState.scores[appState.currentPlayer];
 
-  if (appState.scores[appState.currentPlayer] >= 100) {
-    setTimeout(function() {
-      alert(
-        "Player " +
-          (appState.currentPlayer + 1) +
-          " wins! Click NEW GAME to play again"
-      );
-    }, 100);
+  if (appState.scores[appState.currentPlayer] >= 15) {
+    playerPanelElements[appState.currentPlayer].classList.remove("active");
+    playerPanelElements[appState.currentPlayer].classList.add("winner");
+    playerNameElements[appState.currentPlayer].textContent = "Winner!";
+    diceImg.style.display = "none";
+    rollDiceBtn.style.display = "none";
+    holdBtn.style.display = "none";
   } else {
-    appState.roundScore = 0;
-    updateRoundScoreElement();
-    appState.currentPlayer = appState.currentPlayer ? 0 : 1;
-    updateCurrentPlayerStyling();
+    changeActivePlayer();
   }
+}
+
+function changeActivePlayer() {
+  appState.roundScore = 0;
+  updateRoundScoreElement();
+  appState.currentPlayer = appState.currentPlayer ? 0 : 1;
+  updateCurrentPlayerStyling();
+  setTimeout(function() {
+    diceImg.style.display = "none";
+  }, 150);
 }
 
 function startNewGame() {
@@ -111,6 +117,13 @@ function startNewGame() {
   roundScoreElements[0].textContent = 0;
   roundScoreElements[1].textContent = 0;
   diceImg.style.display = "none";
+  playerPanelElements[0].classList.remove("winner", "active");
+  playerPanelElements[1].classList.remove("winner", "active");
+  playerPanelElements[0].classList.add("active");
+  playerNameElements[0].textContent = "Player 1";
+  playerNameElements[1].textContent = "Player 2";
+  rollDiceBtn.style.display = "block";
+  holdBtn.style.display = "block";
 }
 
 // Attach Event Listeners
